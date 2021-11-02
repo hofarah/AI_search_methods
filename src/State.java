@@ -7,13 +7,15 @@ public class State {
     private int selectedNodeId;
     private State parentState;
     private int depth = 0;
+    public int cost;
 
-    public State(Graph graph, int selectedNodeId, State parentState) {
+    public State(Graph graph, int selectedNodeId, State parentState, int cost) {
         this.graph = graph.copy();
         this.selectedNodeId = selectedNodeId;
         if (parentState != null) {
             this.parentState = parentState;
-            this.depth = parentState.depth+1;
+            this.depth = parentState.depth + 1;
+            this.cost = cost;
         } else {
             this.parentState = null;
         }
@@ -24,7 +26,13 @@ public class State {
         for (int i = 0; i < this.graph.size(); i++) {
             int nodeId = this.graph.getNode(i).getId();
             if (nodeId != selectedNodeId) {
-                State newState = new State(this.graph.copy(), nodeId, this);
+                int toAddCost = 0;
+                switch (this.graph.getNode(nodeId).getColor()) {
+                    case Red -> toAddCost = 1;
+                    case Black -> toAddCost = 2;
+                    case Green -> toAddCost = 3;
+                }
+                State newState = new State(this.graph.copy(), nodeId, this, this.cost + toAddCost);
                 LinkedList<Integer> nodeNeighbors = newState.getGraph().getNode(nodeId).getNeighborsIds();
                 for (int j = 0; j < nodeNeighbors.size(); j++) {
                     int neighborId = nodeNeighbors.get(j);
@@ -94,6 +102,7 @@ public class State {
     public Graph getGraph() {
         return graph;
     }
+
     public int getDepth() {
         return this.depth;
     }
