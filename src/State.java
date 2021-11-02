@@ -6,12 +6,14 @@ public class State {
     private Graph graph;
     private int selectedNodeId;
     private State parentState;
+    private int depth = 0;
 
     public State(Graph graph, int selectedNodeId, State parentState) {
         this.graph = graph.copy();
         this.selectedNodeId = selectedNodeId;
         if (parentState != null) {
             this.parentState = parentState;
+            this.depth = parentState.depth+1;
         } else {
             this.parentState = null;
         }
@@ -91,6 +93,9 @@ public class State {
 
     public Graph getGraph() {
         return graph;
+    }
+    public int getDepth() {
+        return this.depth;
     }
 
     public State getParentState() {
