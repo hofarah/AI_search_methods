@@ -1,8 +1,20 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class State {
+    static class StateComparator implements Comparator<State> {
+        @Override
+        public int compare(State s1, State s2) {
+            if (s1.cost > s2.cost)
+                return 1;
+            else if (s1.cost < s2.cost)
+                return -1;
+            return 0;
+        }
 
+
+    }
     private Graph graph;
     private int selectedNodeId;
     private State parentState;

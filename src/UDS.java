@@ -5,7 +5,7 @@ import java.util.*;
 public class UDS {
 
     public static void search(State initialState) {
-        ArrayList<State> frontier = new ArrayList<>();
+        PriorityQueue<State> frontier = new PriorityQueue<>(new State.StateComparator());
         Hashtable<String, Boolean> inFrontier = new Hashtable<>();
         Hashtable<String, Boolean> explored = new Hashtable<>();
         if (isGoal(initialState)) {
@@ -15,9 +15,7 @@ public class UDS {
         frontier.add(initialState);
         inFrontier.put(initialState.hash(), true);
         while (!frontier.isEmpty()) {
-            frontier.sort(Comparator.comparingInt(o -> o.cost));
-            State tempState = frontier.get(0);
-            frontier.remove(0);
+            State tempState = frontier.poll();
             inFrontier.remove(tempState.hash());
             explored.put(tempState.hash(), true);
             ArrayList<State> children = tempState.successor();
