@@ -2,10 +2,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class Greedy {
+public class A_Star {
 
     public static void search(State initialState) {
-        PriorityQueue<State> frontier = new PriorityQueue<>(new State.StateForHueristicComparator());
+        PriorityQueue<State> frontier = new PriorityQueue<>(new State.StateForFComparator());
         Hashtable<String, Boolean> inFrontier = new Hashtable<>();
         Hashtable<String, Boolean> explored = new Hashtable<>();
         if (isGoal(initialState)) {

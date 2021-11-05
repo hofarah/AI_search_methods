@@ -14,12 +14,23 @@ public class State {
         }
     }
 
-    static class StateForGreedyComparator implements Comparator<State> {
+    static class StateForHueristicComparator implements Comparator<State> {
         @Override
         public int compare(State s1, State s2) {
             if (s1.heuristic < s2.heuristic)
                 return 1;
             else if (s1.heuristic > s2.heuristic)
+                return -1;
+            return 0;
+        }
+    }
+
+    static class StateForFComparator implements Comparator<State> {
+        @Override
+        public int compare(State s1, State s2) {
+            if (s1.f < s2.f)
+                return 1;
+            else if (s1.f > s2.f)
                 return -1;
             return 0;
         }
@@ -31,6 +42,8 @@ public class State {
     private int depth = 0;
     public int cost;
     public float heuristic;
+    public float f;
+    public float g;
 
     public State(Graph graph, int selectedNodeId, State parentState, int cost) {
         this.graph = graph.copy();
@@ -81,8 +94,12 @@ public class State {
                 } else {
                     newState.getGraph().getNode(nodeId).reverseNodeColor();
                 }
-                //comment this line if you do not use greedy algorithm.fixme
+                //comment this line if you do not use agahane algorithm.fixme
                 newState.heuristic = heuristic(newState);
+                float lastG = 0;
+                if (parentState != null) lastG = parentState.g;
+                newState.g = newState.cost + lastG;
+                newState.f = -newState.g + newState.heuristic;
                 children.add(newState);
             }
         }
@@ -113,11 +130,6 @@ public class State {
                 }
             }
         }
-
-
-//        h -= rc;
-//        h -= bc;
-//        h += gc;
 
         return h;
     }
