@@ -17,20 +17,24 @@ public class DFS {
         while (!frontier.isEmpty()) {
             State tmpState = frontier.pop();
             inFrontier.remove(tmpState.hash());
-            explored.put(tmpState.hash(), true);
             ArrayList<State> children = tmpState.successor();
-            for (int i = children.size() - 1; i >= 0; i--) {
+            boolean explore = true;
+            for (int i = 0; i < children.size(); i++) {
                 if (!(inFrontier.containsKey(children.get(i).hash()))
                         && !(explored.containsKey(children.get(i).hash()))) {
                     if (isGoal(children.get(i))) {
                         result(children.get(i));
                         return;
                     }
+                    frontier.push(tmpState);
+                    inFrontier.put(tmpState.hash(), true);
                     frontier.push(children.get(i));
                     inFrontier.put(children.get(i).hash(), true);
+                    explore = false;
+                    break;
                 }
             }
-
+            if (explore) explored.put(tmpState.hash(), true);
         }
     }
 
