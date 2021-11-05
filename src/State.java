@@ -17,7 +17,7 @@ public class State {
     static class StateForGreedyComparator implements Comparator<State> {
         @Override
         public int compare(State s1, State s2) {
-            if (s1.heuristic <s2.heuristic)
+            if (s1.heuristic < s2.heuristic)
                 return 1;
             else if (s1.heuristic > s2.heuristic)
                 return -1;
@@ -82,11 +82,44 @@ public class State {
                     newState.getGraph().getNode(nodeId).reverseNodeColor();
                 }
                 //comment this line if you do not use greedy algorithm.fixme
-                newState.heuristic = Greedy.heuristic(newState);
+                newState.heuristic = heuristic(newState);
                 children.add(newState);
             }
         }
         return children;
+    }
+
+    public float heuristic(State s) {
+        float h = 0;
+        for (int i = 0; i < s.getGraph().size(); i++) {
+            if (s.getGraph().getNode(i).getColor() == Color.Black) {
+                int greenNeighborsCount = 0;
+                int redNeighborsCount = 0;
+                int blackNeighborcount = 0;
+                for (int j = 0; j < s.getGraph().getNode(i).getNeighborsIds().size(); j++) {
+                    int neighborId = s.getGraph().getNode(i).getNeighborsIds().get(j);
+                    switch (s.getGraph().getNode(neighborId).getColor()) {
+                        case Green -> greenNeighborsCount++;
+                        case Red -> redNeighborsCount++;
+                        case Black -> blackNeighborcount++;
+                    }
+                }
+                if (greenNeighborsCount > redNeighborsCount && greenNeighborsCount > blackNeighborcount) {
+                    h += s.getGraph().getNode(i).getNeighborsIds().size();
+                } else if (redNeighborsCount > greenNeighborsCount && redNeighborsCount > blackNeighborcount) {
+                    h += s.getGraph().getNode(i).getNeighborsIds().size() - 1;
+                } else {
+                    h -= s.getGraph().getNode(i).getNeighborsIds().size();
+                }
+            }
+        }
+
+
+//        h -= rc;
+//        h -= bc;
+//        h += gc;
+
+        return h;
     }
 
     public String hash() {
