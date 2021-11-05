@@ -17,9 +17,9 @@ public class State {
     static class StateForHueristicComparator implements Comparator<State> {
         @Override
         public int compare(State s1, State s2) {
-            if (s1.heuristic < s2.heuristic)
+            if (s1.heuristic > s2.heuristic)
                 return 1;
-            else if (s1.heuristic > s2.heuristic)
+            else if (s1.heuristic < s2.heuristic)
                 return -1;
             return 0;
         }
@@ -28,9 +28,9 @@ public class State {
     static class StateForFComparator implements Comparator<State> {
         @Override
         public int compare(State s1, State s2) {
-            if (s1.f < s2.f)
+            if (s1.f > s2.f)
                 return 1;
-            else if (s1.f > s2.f)
+            else if (s1.f < s2.f)
                 return -1;
             return 0;
         }
@@ -99,7 +99,7 @@ public class State {
                 float lastG = 0;
                 if (parentState != null) lastG = parentState.g;
                 newState.g = newState.cost + lastG;
-                newState.f = -newState.g + newState.heuristic;
+                newState.f = newState.g + newState.heuristic;
                 children.add(newState);
             }
         }
@@ -122,11 +122,11 @@ public class State {
                     }
                 }
                 if (greenNeighborsCount > redNeighborsCount && greenNeighborsCount > blackNeighborcount) {
-                    h += s.getGraph().getNode(i).getNeighborsIds().size();
-                } else if (redNeighborsCount > greenNeighborsCount && redNeighborsCount > blackNeighborcount) {
-                    h += s.getGraph().getNode(i).getNeighborsIds().size() - 1;
-                } else {
                     h -= s.getGraph().getNode(i).getNeighborsIds().size();
+                } else if (redNeighborsCount > greenNeighborsCount && redNeighborsCount > blackNeighborcount) {
+                    h -= s.getGraph().getNode(i).getNeighborsIds().size() - 1;
+                } else {
+                    h += s.getGraph().getNode(i).getNeighborsIds().size();
                 }
             }
         }
