@@ -53,6 +53,7 @@ public class State {
             this.depth = parentState.depth + 1;
             this.cost = cost;
         } else {
+            this.f = this.heuristic(this);
             this.parentState = null;
         }
     }
