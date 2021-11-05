@@ -3,7 +3,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 public class State {
-    static class StateComparator implements Comparator<State> {
+    static class StateForUDSComparator implements Comparator<State> {
         @Override
         public int compare(State s1, State s2) {
             if (s1.cost > s2.cost)
@@ -12,14 +12,25 @@ public class State {
                 return -1;
             return 0;
         }
-
-
     }
+
+    static class StateForGreedyComparator implements Comparator<State> {
+        @Override
+        public int compare(State s1, State s2) {
+            if (s1.heuristic <s2.heuristic)
+                return 1;
+            else if (s1.heuristic > s2.heuristic)
+                return -1;
+            return 0;
+        }
+    }
+
     private Graph graph;
     private int selectedNodeId;
     private State parentState;
     private int depth = 0;
     public int cost;
+    public float heuristic;
 
     public State(Graph graph, int selectedNodeId, State parentState, int cost) {
         this.graph = graph.copy();
@@ -70,6 +81,8 @@ public class State {
                 } else {
                     newState.getGraph().getNode(nodeId).reverseNodeColor();
                 }
+                //comment this line if you do not use greedy algorithm.fixme
+                newState.heuristic = Greedy.heuristic(newState);
                 children.add(newState);
             }
         }

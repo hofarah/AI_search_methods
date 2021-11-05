@@ -2,10 +2,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class UDS {
+public class Greedy {
 
     public static void search(State initialState) {
-        PriorityQueue<State> frontier = new PriorityQueue<>(new State.StateForUDSComparator());
+        PriorityQueue<State> frontier = new PriorityQueue<>(new State.StateForGreedyComparator());
         Hashtable<String, Boolean> inFrontier = new Hashtable<>();
         Hashtable<String, Boolean> explored = new Hashtable<>();
         if (isGoal(initialState)) {
@@ -72,6 +72,50 @@ public class UDS {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+    }
+
+    public static float heuristic(State s) {
+        float h = 0;
+        int gc = 0;
+        int rc = 0;
+        int bc = 0;
+        for (int i = 0; i < s.getGraph().size(); i++) {
+            if (s.getGraph().getNode(i).getColor() == Color.Green) {
+                gc++;
+            }
+        }
+
+        for (int i = 0; i < s.getGraph().size(); i++) {
+            if (s.getGraph().getNode(i).getColor() == Color.Black) {
+                int greenNeighborsCount = 0;
+                int redNeighborsCount = 0;
+                int blackNeighborcount = 0;
+                for (int j = 0; j < s.getGraph().getNode(i).getNeighborsIds().size(); j++) {
+                    int neighborId = s.getGraph().getNode(i).getNeighborsIds().get(j);
+                    switch (s.getGraph().getNode(neighborId).getColor()) {
+                        case Green -> greenNeighborsCount++;
+                        case Red -> redNeighborsCount++;
+                        case Black -> blackNeighborcount++;
+                    }
+                }
+                if (greenNeighborsCount > redNeighborsCount && greenNeighborsCount > blackNeighborcount) {
+                    h+= s.getGraph().getNode(i).getNeighborsIds().size();
+                }else if (redNeighborsCount > greenNeighborsCount && redNeighborsCount > blackNeighborcount) {
+                    h+= s.getGraph().getNode(i).getNeighborsIds().size()-1;
+                }else{
+                    h-=s.getGraph().getNode(i).getNeighborsIds().size();
+                }
+            }
+        }
+
+
+
+
+//        h -= rc;
+//        h -= bc;
+//        h += gc;
+
+        return h;
     }
 }
 
