@@ -17,11 +17,9 @@ public class A_Star {
         while (!frontier.isEmpty()) {
             State tempState = frontier.poll();
             inFrontier.remove(tempState.hash());
-            explored.put(tempState.hash(), true);
             ArrayList<State> children = tempState.successor();
             for (int i = 0; i < children.size(); i++) {
-                if (!(inFrontier.containsKey(children.get(i).hash()))
-                        && !(explored.containsKey(children.get(i).hash()))) {
+                if (!(inFrontier.containsKey(children.get(i).hash()))) {
                     if (isGoal(children.get(i))) {
                         result(children.get(i));
                         return;
