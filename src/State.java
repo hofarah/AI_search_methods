@@ -44,6 +44,7 @@ public class State {
     public float heuristic;
     public float f;
     public float g;
+    public String hashh;
 
     public State(Graph graph, int selectedNodeId, State parentState, int cost) {
         this.graph = graph.copy();
@@ -99,8 +100,10 @@ public class State {
                 newState.heuristic = heuristic(newState);
                 float lastG = 0;
                 if (parentState != null) lastG = parentState.g;
-                newState.g = newState.cost + lastG;
+//                newState.g = newState.cost + lastG;
+                newState.g = newState.depth + lastG;
                 newState.f = newState.g + newState.heuristic;
+                newState.hashh=newState.hash();
                 children.add(newState);
             }
         }

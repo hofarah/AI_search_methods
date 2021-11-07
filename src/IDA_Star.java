@@ -5,7 +5,7 @@ import java.util.*;
 public class IDA_Star {
 
     public static void search(State initialState) {
-        PriorityQueue<State> frontier = new PriorityQueue<>(new State.StateForFComparator());
+        Stack<State> frontier = new Stack<>();
         Hashtable<String, Boolean> inFrontier = new Hashtable<>();
         Hashtable<String, Boolean> explored = new Hashtable<>();
         if (isGoal(initialState)) {
@@ -13,15 +13,15 @@ public class IDA_Star {
             return;
         }
         float cutOff = initialState.f;
-        float newCutOff = 10000;
         while (true) {
+            float newCutOff = 10000;
             frontier.clear();
             inFrontier.clear();
             explored.clear();
-            frontier.add(initialState);
+            frontier.push(initialState);
             inFrontier.put(initialState.hash(), true);
             while (!frontier.isEmpty()) {
-                State tempState = frontier.poll();
+                State tempState = frontier.pop();
                 inFrontier.remove(tempState.hash());
                 ArrayList<State> children = tempState.successor();
                 boolean explore = true;
@@ -33,14 +33,17 @@ public class IDA_Star {
                                 result(children.get(i));
                                 return;
                             }
-                            frontier.add(tempState);
+                            frontier.push(tempState);
                             inFrontier.put(tempState.hash(), true);
-                            frontier.add(children.get(i));
+                            frontier.push(children.get(i));
                             inFrontier.put(children.get(i).hash(), true);
                             explore = false;
                             break;
                         } else {
-                            if (children.get(i).f < newCutOff) newCutOff = children.get(i).f;
+                            if (children.get(i).f < newCutOff){
+                                newCutOff = children.get(i).f;
+                                explored.put(children.get(i).hash(), true);
+                            }
                         }
                     }
                 }
@@ -48,11 +51,7 @@ public class IDA_Star {
                     explored.put(tempState.hash(), true);
                 }
             }
-            if (cutOff == newCutOff) {
-                newCutOff++;
-            } else {
                 cutOff = newCutOff;
-            }
         }
     }
 
