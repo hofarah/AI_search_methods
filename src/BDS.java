@@ -4,60 +4,53 @@ import java.util.*;
 
 public class BDS {
 
-    public static void search(State initialState, State finalState, int cutOff) {
-        Stack<State> fromInitialStateFrontier = new Stack<State>();
+    public static void search(State initialState, State finalState) {
+        Queue<State> fromInitialStateFrontier = new LinkedList<State>();
         Hashtable<String, State> fromInitialStateInFrontier = new Hashtable<>();
         Hashtable<String, State> fromInitialStateExplored = new Hashtable<>();
-        Stack<State> fromGoalStateFrontier = new Stack<State>();
+
+        Queue<State> fromGoalStateFrontier = new LinkedList<State>();
         Hashtable<String, State> fromGoalStateInFrontier = new Hashtable<>();
         Hashtable<String, State> fromGoalStateExplored = new Hashtable<>();
 
-        for (int currentLimit = 0; currentLimit <= cutOff; currentLimit++) {
-            fromInitialStateFrontier.clear();
-            fromInitialStateInFrontier.clear();
-            fromInitialStateExplored.clear();
-            fromInitialStateFrontier.push(initialState);
+            fromInitialStateFrontier.add(initialState);
             fromInitialStateInFrontier.put(initialState.hash(), initialState);
 
-            fromGoalStateFrontier.clear();
-            fromGoalStateInFrontier.clear();
-            fromGoalStateExplored.clear();
-            fromGoalStateFrontier.push(finalState);
-            fromGoalStateInFrontier.put(finalState.hash(), initialState);
+            fromGoalStateFrontier.add(finalState);
+            fromGoalStateInFrontier.put(finalState.hash(), finalState);
 
             while (!fromInitialStateFrontier.isEmpty() && !fromGoalStateFrontier.isEmpty()) {
-                State initialTmpState = fromInitialStateFrontier.pop();
+                State initialTmpState = fromInitialStateFrontier.poll();
                 fromInitialStateInFrontier.remove(initialTmpState.hash());
                 fromInitialStateExplored.put(initialTmpState.hash(), initialTmpState);
                 ArrayList<State> initialChildren = initialTmpState.successor();
 
-                State GoalTmpState = fromGoalStateFrontier.pop();
+                State GoalTmpState = fromGoalStateFrontier.poll();
                 fromGoalStateInFrontier.remove(GoalTmpState.hash());
                 fromGoalStateExplored.put(GoalTmpState.hash(), GoalTmpState);
                 ArrayList<State> goalChildren = GoalTmpState.successor();
-                for (int i = initialChildren.size() - 1; i >= 0; i--) {
+                for (int i = 0; i < initialChildren.size(); i++) {
                     if (!(fromInitialStateInFrontier.containsKey(initialChildren.get(i).hash()))
-                            && !(fromInitialStateExplored.containsKey(initialChildren.get(i).hash())) && initialChildren.get(i).getDepth() <= currentLimit) {
+                            && !(fromInitialStateExplored.containsKey(initialChildren.get(i).hash()))) {
                         if (isGoal(null, null, fromGoalStateInFrontier, fromGoalStateExplored,  initialChildren.get(i),null)) {
                             return;
                         }
-                        fromInitialStateFrontier.push(initialChildren.get(i));
+                        fromInitialStateFrontier.add(initialChildren.get(i));
                         fromInitialStateInFrontier.put(initialChildren.get(i).hash(), initialChildren.get(i));
                     }
                 }
-                for (int i = goalChildren.size() - 1; i >= 0; i--) {
+                for (int i = 0; i < goalChildren.size(); i++) {
                     if (!(fromGoalStateInFrontier.containsKey(goalChildren.get(i).hash()))
-                            && !(fromGoalStateExplored.containsKey(goalChildren.get(i).hash())) && goalChildren.get(i).getDepth() <= currentLimit) {
+                            && !(fromGoalStateExplored.containsKey(goalChildren.get(i).hash()))) {
                         if (isGoal(fromInitialStateInFrontier, fromInitialStateExplored, null, null, null, goalChildren.get(i))) {
                             return;
                         }
-                        fromGoalStateFrontier.push(goalChildren.get(i));
+                        fromGoalStateFrontier.add(goalChildren.get(i));
                         fromGoalStateInFrontier.put(goalChildren.get(i).hash(), goalChildren.get(i));
                     }
                 }
 
             }
-        }
     }
 
     private static boolean isGoal(Hashtable<String, State> fromInitialStateInFrontier, Hashtable<String,
