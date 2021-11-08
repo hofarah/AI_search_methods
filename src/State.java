@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.LinkedList;
 
 public class State {
@@ -54,7 +55,7 @@ public class State {
             this.depth = parentState.depth + 1;
             this.cost = cost;
         } else {
-            this.f = this.heuristic(this);
+            this.heuristic = heuristic(this);
             this.parentState = null;
         }
     }
@@ -103,7 +104,7 @@ public class State {
 //                newState.g = newState.cost + lastG;
                 newState.g = newState.depth + lastG;
                 newState.f = newState.g + newState.heuristic;
-                newState.hashh=newState.hash();
+                newState.hashh = newState.hash();
                 children.add(newState);
             }
         }
@@ -112,29 +113,50 @@ public class State {
 
     public float heuristic(State s) {
         float h = 0;
+        Hashtable<Integer, Boolean> checked = new Hashtable<>();
         for (int i = 0; i < s.getGraph().size(); i++) {
-            if (s.getGraph().getNode(i).getColor() == Color.Black) {
-                int greenNeighborsCount = 0;
-                int redNeighborsCount = 0;
-                int blackNeighborcount = 0;
-                for (int j = 0; j < s.getGraph().getNode(i).getNeighborsIds().size(); j++) {
-                    int neighborId = s.getGraph().getNode(i).getNeighborsIds().get(j);
-                    switch (s.getGraph().getNode(neighborId).getColor()) {
-                        case Green -> greenNeighborsCount++;
-                        case Red -> redNeighborsCount++;
-                        case Black -> blackNeighborcount++;
-                    }
+            Node node = s.getGraph().getNode(i);
+            if (node.groupID != 0) continue;
+
+            checked.put(node.getId(), true);
+            LinkedList<Integer> neighborsIds = node.getNeighborsIds();
+            int redNeighbors = 0;
+            int greenNeighbors = 0;
+            double groupID = Math.random();
+            for (int j = 0; j < neighborsIds.size(); j++) {
+                Node neighborNode = s.graph.getNode(neighborsIds.get(j));
+                if (neighborNode.getColor() == Color.Red && neighborNode.groupID == 0) {
+                    redNeighbors++;
                 }
-                if (greenNeighborsCount > redNeighborsCount && greenNeighborsCount > blackNeighborcount) {
-                    h -= s.getGraph().getNode(i).getNeighborsIds().size();
-                } else if (redNeighborsCount > greenNeighborsCount && redNeighborsCount > blackNeighborcount) {
-                    h -= s.getGraph().getNode(i).getNeighborsIds().size() - 1;
-                } else {
-                    h += s.getGraph().getNode(i).getNeighborsIds().size();
+                if (neighborNode.getColor() == Color.Green) {
+                    greenNeighbors++;
                 }
             }
-        }
+            if (redNeighbors == 0) {
+                if (node.getColor() == Color.Red) h++;
+            }//2 approach
+            if (greenNeighbors > redNeighbors) h -= greenNeighbors;
 
+            if (redNeighbors > 0) {//second approach is greater than half
+                for (int j = 0; j < neighborsIds.size(); j++) {
+                    Node neighborNode = s.graph.getNode(neighborsIds.get(j));
+                    if (neighborNode.getColor() == Color.Red && neighborNode.groupID == 0) {
+                        s.graph.getNode(neighborNode.getId()).groupID = groupID;
+                        if (checked.containsKey(neighborNode.getId())) h--;
+                    }
+                }
+                if (node.getColor() != Color.Green) {
+
+                    s.graph.getNode(node.getId()).groupID = groupID;
+                }
+                h++;
+            }
+//            if (node.getColor() == Color.Black) {
+//                if (greenNeighbors > redNeighbors) h++;
+//            }
+
+
+        }
         return h;
     }
 
