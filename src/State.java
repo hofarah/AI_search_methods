@@ -1,7 +1,6 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.LinkedList;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 public class State {
     static class StateForUDSComparator implements Comparator<State> {
@@ -159,6 +158,47 @@ public class State {
         }
         return h;
     }
+    public void result() {
+        Stack<State> states = new Stack<State>();
+        State state=this;
+        while (true) {
+            states.push(state);
+            if (state.getParentState() == null) {
+                break;
+            } else {
+                state = state.getParentState();
+            }
+        }
+        try {
+            FileWriter myWriter = new FileWriter("BfsResult.txt");
+            System.out.println("initial state : ");
+            while (!states.empty()) {
+                State tempState = states.pop();
+                if (tempState.getSelectedNodeId() != -1) {
+                    System.out.println("selected id : " + tempState.getSelectedNodeId());
+                }
+                tempState.getGraph().print();
+
+                myWriter.write(tempState.getSelectedNodeId() + " ,");
+                myWriter.write(tempState.outputGenerator() + "\n");
+            }
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+    public boolean isGoal() {
+        for (int i = 0; i < this.getGraph().size(); i++) {
+            if (this.getGraph().getNode(i).getColor() == Color.Red
+                    || this.getGraph().getNode(i).getColor() == Color.Black) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     public String hash() {
         String result = "";

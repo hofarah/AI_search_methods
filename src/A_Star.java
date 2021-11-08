@@ -7,9 +7,8 @@ public class A_Star {
     public static void search(State initialState) {
         PriorityQueue<State> frontier = new PriorityQueue<>(new State.StateForFComparator());
         Hashtable<String, Boolean> inFrontier = new Hashtable<>();
-        Hashtable<String, Boolean> explored = new Hashtable<>();
-        if (isGoal(initialState)) {
-            result(initialState);
+        if (initialState.isGoal()) {
+            initialState.result();
             return;
         }
         frontier.add(initialState);
@@ -20,8 +19,8 @@ public class A_Star {
             ArrayList<State> children = tempState.successor();
             for (int i = 0; i < children.size(); i++) {
                 if (!(inFrontier.containsKey(children.get(i).hash()))) {
-                    if (isGoal(children.get(i))) {
-                        result(children.get(i));
+                    if (children.get(i).isGoal()) {
+                        children.get(i).result();
                         return;
                     }
                     frontier.add(children.get(i));

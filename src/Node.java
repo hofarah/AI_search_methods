@@ -3,6 +3,7 @@ import java.util.LinkedList;
 public class Node {
 
     private int id;
+    public double groupID;
     private Color color;
     private LinkedList<Integer> neighborsIds;
 
