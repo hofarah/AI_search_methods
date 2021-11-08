@@ -41,4 +41,5 @@
   ۵.همچنین خود گره انتخابی نیز بررسی میشود و درصورت نیاز با همسایه ها هم گروه میشود.
   
 </p>
- ![image](https://user-images.githubusercontent.com/53389261/140806716-5aa4a3df-affd-48df-8eea-984dbf789783.png)
+
+ ![نحوه گروه بندی](https://user-images.githubusercontent.com/53389261/140806716-5aa4a3df-affd-48df-8eea-984dbf789783.png)
