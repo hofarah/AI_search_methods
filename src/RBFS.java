@@ -3,76 +3,50 @@ import java.io.IOException;
 import java.util.*;
 
 public class RBFS {
-    static Hashtable<String, State> saved = new Hashtable<>();
-    static Hashtable<String, Boolean> inFrontier = new Hashtable<>();
 
-    static float RBFSSearch(State s, float best) {
-        inFrontier.put(s.hash(), true);
-        ArrayList<State> children = s.successor();
-        for (int i = 0; i < children.size(); i++) {
-            if (!(inFrontier.containsKey(children.get(i).hash()))) {
-                if (saved.containsKey(children.get(i).hash())) {
-                    children.set(i, saved.get(children.get(i).hash()));
-                }
-            } else {
-                children.remove(i);
-                i--;
-            }
-        }
-        if (children.isEmpty()) {
-            inFrontier.remove(s.hash(), true);
+    static float NewRBFS(State s, float best) {
+        if (best < s.f) {
             return s.f;
+        }
+        if (isGoal(s)) {
+            result(s);
+            return Float.MIN_VALUE;
+        }
+        ArrayList<State> children = s.successor();
+
+        if (children.isEmpty()) {
+            return Float.MAX_VALUE;
         }
         if (children.size() > 1) {
             children.sort((o1, o2) -> Float.compare(o1.f, o2.f));
         }
-        for (int i = 0; i < children.size(); i++) {
-            float secBest = secMin(best, children);
-            if (best < children.get(i).f) {
-                inFrontier.remove(s.hash(), true);
-                return min(children);
-            }
-            if (isGoal(children.get(i))) {
-                result(children.get(i));
-                return Float.MIN_VALUE;
-            }
-            children.get(i).f = RBFSSearch(children.get(i), secBest);
-            if (children.get(i).f == Float.MIN_VALUE) {
-                return Float.MIN_VALUE;
+        float bestLimit = best;
+        if (children.size() > 1) {
+            bestLimit = Math.min(children.get(1).f, best);
+        }
+        float childBest = children.get(0).f;
+        while (childBest <= best) {
+            //sort
+            if (children.size() > 1) {
+                children.sort((o1, o2) -> Float.compare(o1.f, o2.f));
+                bestLimit = Math.min(children.get(1).f, best);
             } else {
-                saved.put(children.get(i).hash(), children.get(i));
+                bestLimit = best;
+            }
+            float newF = NewRBFS(children.get(0), bestLimit);
+            if (newF == Float.MIN_VALUE) return Float.MIN_VALUE;
+            children.get(0).f = newF;
+            if (children.size() > 1) {
+                childBest = Math.min(newF, children.get(1).f);
+            } else {
+                childBest = newF;
             }
         }
-        inFrontier.remove(s.hash(), true);
-        return min(children);
-    }
-
-    static float secMin(float a, ArrayList<State> stateArrayList) {
-        if (stateArrayList.isEmpty()) {
-            return a;
-        }
-        if (stateArrayList.size() > 1) {
-            stateArrayList.sort((o1, o2) -> Float.compare(o1.f, o2.f));
-            return Math.min(a, stateArrayList.get(1).f);
-        } else {
-            return Math.max(a, stateArrayList.get(0).f);
-        }
-    }
-
-    static float min(ArrayList<State> stateArrayList) {
-        float min = 10000000;
-        for (int i = 0; i < stateArrayList.size(); i++) {
-            if (stateArrayList.get(i).f < min) {
-                min = stateArrayList.get(i).f;
-            }
-        }
-        return min;
+        return childBest;
     }
 
     public static void search(State initialState) {
-        float res = 1;
-        while (res != Float.MIN_VALUE)
-            res = RBFSSearch(initialState, 1000000000);
+            NewRBFS(initialState, 1000000000);
     }
 
 
@@ -86,10 +60,6 @@ public class RBFS {
         return true;
     }
 
-    private static ArrayList<State> sort(ArrayList<State> a) {
-        a.sort((o1, o2) -> Float.compare(o1.f, o2.f));
-        return a;
-    }
 
     private static void result(State state) {
         Stack<State> states = new Stack<State>();
